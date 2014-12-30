@@ -1,5 +1,5 @@
 # The Great Voice Driven Turtle Race
-## A voice-driven game in JavaScript using audio input as control via the Google Hangout API
+## A voice-driven game in JavaScript using audio input as control via the Google+ Hangout API
 
 [![ScreenShot](http://img.youtube.com/vi/AK4hgwO5zm0/0.jpg)](http://youtu.be/AK4hgwO5zm0)
 
