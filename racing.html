@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<title>Hangout API - The Great Voice-Driven Turtle Race</title>
+		<style>
+			CANVAS { border:1px solid #000000; }
+		</style>
+	</head>
+	<body>
+		<canvas id="racetrack" width="850" height="350"></canvas>
+		<script>
+			var canvas = document.getElementById('racetrack'),
+					context = canvas.getContext('2d'),
+					turtle = new Image(),
+					street = new Image(),
+					x = y = 100,
+					vx = 1;
+			const FPS = 30;
+				
+			window.onload = function() {
+				loadImages();
+				gameLoop();
+			}
+			
+			function loadImages() {
+				street.src = 'street.jpg';
+				street.onload = function() { 
+					context.drawImage(street,0,0,canvas.width,canvas.height);	
+				};
+				
+				turtle.src = 'turtle.jpg';
+				turtle.onload = function() { 
+					context.drawImage(turtle,x,y);	
+				};
+			}
+			
+			// refactor using requestAnimationFrame()
+			function gameLoop() {
+				setInterval(draw,1000/FPS);
+			}
+			
+			function draw() {
+				if(x <= canvas.width-turtle.width) {
+					context.clearRect(0,0,canvas.width,canvas.height);
+					context.drawImage(street,0,0,canvas.width,canvas.height);
+					context.drawImage(turtle,x,y);
+					x += vx;
+				}
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+	<ModulePrefs title="Hangout API 0.2 app - Voice-Driven Turtle Race">
+		<Require feature="rpc"/>
+	</ModulePrefs>
+	<Content type="html">
+		<![CDATA[
+			<!DOCTYPE html>
+				<head>
+					<style>
+						BODY { font-family:Arial; }
+					</style>
+				</head>
+				<body>
+					<!-- this script ALWAYS goes first -->
+					<script src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=0.2"></script>
+					
+					<h2>Using audio as program input with <a href="https://developers.google.com/+/hangouts/reference">Hangout API 0.2</a></h2>
+					<h3>Here's a quick demo I did, borrowing an idea from <a href="http://www.youtube.com/user/japanandroid?feature=watch">japanandroid</a>'s rad <a href="http://youtu.be/Yo4dX61AlTg">example in GWT</a>. Use your voice to cheer on the turtle and let him race towards the finish line. The secret sauce is hooking into the <i>onVolumesChanged</i> event and manipulating the user's inbound audio level.</h3>
+					<canvas id="racetrack" width="850" height="350"></canvas>
+					<hr/>
+					<h3>All the code is in <a href="http://dl.dropbox.com/u/12019700/hangouts-api/gadget.xml">a single gadget</a>...enjoy!</h3>
+					
+					<script>
+
+						var canvas = document.getElementById('racetrack'),
+								context = canvas.getContext('2d'),
+								turtle = new Image(),
+								street = new Image(),
+								x = y = 25,
+								vx = 0;
+						const FPS = 30;
+					
+						// a function to be run at the app's initialization phase
+						function init() {
+							console.log('Init app.');
+							
+							
+							var apiReady = function(eventObj) {
+								if(eventObj.isApiReady) {
+									console.log('API is ready.');
+									
+									// load images
+									street.src = '//dl.dropbox.com/u/12019700/hangouts-api/street.jpg';
+									street.onload = function() { 
+										context.drawImage(street,0,0,canvas.width,canvas.height);	
+									};
+									
+									turtle.src = '//dl.dropbox.com/u/12019700/hangouts-api/turtle.jpg';
+									turtle.onload = function() { 
+										context.drawImage(turtle,x,y);	
+									};
+									
+									setInterval(draw,1000/FPS);
+									
+									
+									/* app testing code */
+									var id = gapi.hangout.getParticipantId();
+									console.log('testing audio levels with: ' + id);
+									
+									var audioLevel = document.createElement('div');
+									document.body.appendChild(audioLevel);
+									
+									gapi.hangout.av.onVolumesChanged.add(function(e) {
+										// handle the audio levels
+										console.log('volume changed!');
+										var level = gapi.hangout.av.getParticipantVolume(id);
+										console.log('USER VOLUME LEVEL: ' + level); 
+										
+										var signal = '';
+										
+										if(level == 0) {
+											vx = 0;
+										} else {
+											// repeat the '#' character to match the audio level
+											for(var i=0;i<parseInt(level);i++) {
+												 signal += '##';
+												 vx = parseInt(level)*3; 
+												 console.log('AUDIO: ' + level);
+												 console.log('VX: ' + vx);
+											}
+										}
+										
+										audioLevel.innerHTML = 'YOUR AUDIO LEVEL: ' + signal;
+									});
+									
+									gapi.hangout.onApiReady.remove(apiReady);
+								}
+							};
+							
+							// use this special API ready state event to add any more complex app setup
+							gapi.hangout.onApiReady.add(apiReady);
+						}
+						
+						function draw() {
+							if(x <= canvas.width-turtle.width) {
+								context.clearRect(0,0,canvas.width,canvas.height);
+								context.drawImage(street,0,0,canvas.width,canvas.height);
+								context.drawImage(turtle,x,y);
+								x += vx;
+							} else {
+								var winner = 'YOU WIN...AGAINST NO ONE!';
+								context.font = 'italic 45px Arial';
+								context.fillStyle = 'red';
+								context.fillText(winner,100,100); 
+							}
+						}
+
+						gadgets.util.registerOnLoadHandler(init);
+						
+					</script>
+				</body>
+
+		]]>
+	</Content>
+</Module>
